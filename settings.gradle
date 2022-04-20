@@ -1,0 +1,6 @@
+
+rootProject.name = "clojure-testing"
+
+include ":clojure-testing"
+
+include ":sample-project"

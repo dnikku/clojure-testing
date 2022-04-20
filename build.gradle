@@ -1,0 +1,16 @@
+
+defaultTasks 'assemble'
+
+allprojects {
+
+    repositories {
+
+        mavenCentral()
+
+        maven {
+            name = 'clojars'
+            url = 'https://repo.clojars.org'
+        }
+    }
+
+}
