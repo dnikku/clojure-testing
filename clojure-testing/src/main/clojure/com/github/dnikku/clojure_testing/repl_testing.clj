@@ -11,7 +11,6 @@
 
 (defmulti report :type)
 
-
 (def -run-tests
   (fn []
     (println (c/colorize [:cyan-bg] ":warn Rerun command!\n"))
@@ -45,7 +44,7 @@
                            #'*print-ex-exclude-re*  exclude-re}
                           (t/run-all-tests pattern))))))
 
-   (let [error (refresh :after 'dev.repl-testing/-run-tests)]
+   (let [error (refresh :after 'com.github.dnikku.clojure-testing.repl-testing/-run-tests)]
      (cond
        (= :summary (:type error))
        (let [m error]
