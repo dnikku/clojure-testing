@@ -14,8 +14,14 @@
   `(t/deftest ~name ~@body))
 
 (defmacro is
-  ([form] `(t/is ~form))
-  ([form msg] `(t/is ~msg ~form)))
+  ([form] `(is ~form nil))
+  ([form msg]
+   #_(println ":meta" (meta form) ":form" &form)
+   `(try ~(t/assert-expr msg form)
+     (catch Throwable t#
+       (t/do-report
+        {:type     :error, :message ~msg,
+         :expected '~form, :actual t#})))))
 
 (defmacro are
   "Forwards declaration to `clojure.test/are`"
