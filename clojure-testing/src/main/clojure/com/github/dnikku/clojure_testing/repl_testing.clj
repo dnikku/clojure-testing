@@ -102,6 +102,7 @@
    (println (c/colorize [:red] "\nFAIL in") (get-running-test))
    (when (seq t/*testing-contexts*) (println (t/testing-contexts-str)))
    (when-let [message (:message m)] (println message))
+   (when (:form m) (println "    form:" (:form m) :meta (:form-meta m)))
    (println "expected:" (:expected m))
    (println "  actual:" (:actual m))
    (when (:diffs m) (println "   diffs:" (:diffs m)))
