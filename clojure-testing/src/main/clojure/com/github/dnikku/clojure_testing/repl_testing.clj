@@ -26,6 +26,7 @@
                #"^clojure\."
                #"^nrepl\."
                #"^dev[\$\.]"
+               #"^com\.github\.dnikku\.clojure_testing\.repl_testing"
                ;;
                ]))
 

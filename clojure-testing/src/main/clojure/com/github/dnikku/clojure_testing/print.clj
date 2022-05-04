@@ -18,18 +18,18 @@
                                       #"^nrepl\."
                                       #"^dev\."])
 
-
 (defn print-ex1
   "Print only current Exception to stdout."
   [^Throwable tr]
-  (let [st    (if (instance? ExceptionInfo tr)
-                (let [exc (read-string (subs (pr-str tr) (count "#error")))]
-                  (map
-                   (fn [[cls method file line]]
-                     (StackTraceElement. (str cls) (str method) (str file) line))
-                   (:trace exc)))
-                (.getStackTrace tr))
-        limit (or *print-ex-stack-limit* 1000)]
+  (let [st         (if (instance? ExceptionInfo tr)
+                     (let [exc (read-string (subs (pr-str tr) (count "#error")))]
+                       (map
+                        (fn [[cls method file line]]
+                          (StackTraceElement. (str cls) (str method) (str file) line))
+                        (:trace exc)))
+                     (.getStackTrace tr))
+        limit      (or *print-ex-stack-limit* 1000)
+        exclude-re (or *print-ex-exclude-re* [])]
     (stacktrace/print-throwable tr)
     (newline)
     (print " at ")
@@ -39,8 +39,7 @@
         (doseq [e (->> (rest st)
                        (remove
                         (fn [^StackTraceElement e]
-                          (some #(re-find % (str (.getClassName e) "." (.getMethodName e)))
-                                (:exclude-re *print-ex-exclude-re*))))
+                          (some #(re-find % (str (.getClassName e) "." (.getMethodName e))) exclude-re)))
                        (take limit))]
           (newline)
           (print "    ")
