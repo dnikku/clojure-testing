@@ -100,7 +100,8 @@
   (t/with-test-out
    (t/inc-report-counter :fail)
    (println (c/colorize [:red] "\nFAIL in") (get-running-test))
-   (when (seq t/*testing-contexts*) (println (t/testing-contexts-str)))
+   (when (seq t/*testing-contexts*)
+     (println (c/colorize [:white] (str "\t> \"" (t/testing-contexts-str) "\""))))
    (when-let [message (:message m)] (println message))
    (when (:form m) (println "    form:" (:form m) :meta (:form-meta m)))
    (println "expected:" (:expected m))
@@ -113,7 +114,8 @@
   (t/with-test-out
    (t/inc-report-counter :error)
    (println (c/colorize [:bold :red] "\nERROR in") (get-running-test))
-   (when (seq t/*testing-contexts*) (println (t/testing-contexts-str)))
+   (when (seq t/*testing-contexts*)
+     (println (c/colorize [:white] (str "\t> \"" (t/testing-contexts-str) "\""))))
    (when-let [message (:message m)] (println (c/colorize [:red] message)))
    (let [actual (:actual m)]
      (if (instance? Throwable actual)
