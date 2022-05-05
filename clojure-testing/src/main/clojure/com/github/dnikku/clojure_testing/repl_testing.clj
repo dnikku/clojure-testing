@@ -102,8 +102,8 @@
    (println (c/colorize [:red] "\nFAIL in") (get-running-test))
    (when (seq t/*testing-contexts*)
      (println (c/colorize [:white] (str "\t> \"" (t/testing-contexts-str) "\""))))
-   (when-let [message (:message m)] (println message))
    (when (:form m) (println "    form:" (:form m) :meta (:form-meta m)))
+   (when (:message m) (println (c/colorize [:red] (str "     msg: " (:message m)))))
    (println "expected:" (:expected m))
    (println "  actual:" (:actual m))
    (when (:diffs m) (println "   diffs:" (:diffs m)))
@@ -116,7 +116,7 @@
    (println (c/colorize [:bold :red] "\nERROR in") (get-running-test))
    (when (seq t/*testing-contexts*)
      (println (c/colorize [:white] (str "\t> \"" (t/testing-contexts-str) "\""))))
-   (when-let [message (:message m)] (println (c/colorize [:red] message)))
+   (when (:message m) (println (c/colorize [:red] (str "     msg: " (:message m)))))
    (let [actual (:actual m)]
      (if (instance? Throwable actual)
        (print-ex actual)
