@@ -63,7 +63,7 @@
   [s expr]
   `(let [start# (System/nanoTime)
          ret#   ~expr]
-    (prn
+    (println
      (str ~s " Elapsed time: " (/ (double (- (System/nanoTime) start#)) 1000000.0) " msecs"))
     ret#))
 
