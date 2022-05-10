@@ -67,6 +67,18 @@
      (str ~s " Elapsed time: " (/ (double (- (System/nanoTime) start#)) 1000000.0) " msecs"))
     ret#))
 
+(defmacro timeit->nano
+  "Evaluates expr and returns the time it took."
+  [expr]
+  `(let [start# (System/nanoTime)]
+    ~expr
+    (- (System/nanoTime) start#)))
+
+(defn nano->msecs
+  "Converts a value from nanoseconds to milliseconds."
+  [x]
+  (/ (double x) 1000000.0))
+
 
 (def diffs-output?
   "If lambdaisland.deep-diff2 is in classpath loaded and set it true,
