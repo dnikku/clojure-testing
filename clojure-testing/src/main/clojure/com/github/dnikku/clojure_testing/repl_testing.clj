@@ -43,7 +43,9 @@
                           {#'t/report               report
                            #'*print-ex-stack-limit* nil
                            #'*print-ex-exclude-re*  exclude-re}
-                          (t/run-all-tests pattern))))))
+                          (let [start-at (System/currentTimeMillis)]
+                            (assoc (t/run-all-tests pattern)
+                                   :duration-ms (- (System/currentTimeMillis) start-at))))))))
 
    (let [error (refresh :after 'com.github.dnikku.clojure-testing.repl-testing/-run-tests)]
      (cond
@@ -52,7 +54,8 @@
          (newline)
          (println
           (c/colorize [:bold :inverse]
-                      "Ran " (:test m) " tests containing " (+ (:pass m) (:fail m) (:error m)) " assertions."
+                      "Ran " (:test m) " tests containing " (+ (:pass m) (:fail m) (:error m)) " assertions"
+                      " (in " (:duration-ms m) " msecs)."
                       "\n\t" (:fail m) " failures, " (:error m) " errors.\n"))
          :done)
 
@@ -102,10 +105,16 @@
    (println (c/colorize [:red] "\nFAIL in") (get-running-test))
    (when (seq t/*testing-contexts*)
      (println (c/colorize [:white] (str "\t> \"" (t/testing-contexts-str) "\""))))
-   (when (:form m) (println "    form:" (:form m) :meta (:form-meta m)))
+   (when (:form m)
+     (print "    form: ")
+     (prn (:form m) :meta (:form-meta m)))
    (when (:message m) (println (c/colorize [:red] (str "     msg: " (:message m)))))
-   (println "expected:" (:expected m))
-   (println "  actual:" (:actual m))
+   (print "expected: ") (prn (:expected m))
+   (print "  actual: ")
+   (let [actual (:actual m)]
+     (if (instance? Throwable actual)
+       (print-ex actual)
+       (prn actual)))
    (when (:diffs m) (println "   diffs:" (:diffs m)))
    (newline)))
 
