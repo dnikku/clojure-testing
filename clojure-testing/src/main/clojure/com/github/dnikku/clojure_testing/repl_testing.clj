@@ -121,6 +121,7 @@
        (print-ex actual)
        (prn actual)))
    (when (:diffs m) (println "   diffs:" (:diffs m)))
+   (when (:output m) (println "  stdout:") (println (str/trim-newline (:output m))))
    (newline)))
 
 (defmethod report :error
@@ -136,6 +137,7 @@
        (print-ex actual)
        ; (clojure.stacktrace/print-cause-trace actual)
        (prn actual)))
+   (when (:output m) (println "  stdout:") (println (str/trim-newline (:output m))))
    (newline)))
 
 

@@ -8,21 +8,32 @@
     [java.util.regex Pattern]))
 
 (def ^:dynamic *assert-meta* nil)
+(def ^:dynamic *assert-out* nil)
 
 (defmacro deftest
   "Forwards declaration to `clojure.test/deftest`"
   [name & body]
   `(t/deftest ~name ~@body))
 
+(with-out-str)
+
 (defmacro is
   ([form] `(is ~form nil))
   ([form msg]
-   `(binding [*assert-meta* ~(meta form)]
-     (try ~(t/assert-expr msg form)
-       (catch Throwable t#
-         (t/do-report
-          {:type     :error, :message ~msg,
-           :expected '~form, :actual t#}))))))
+   `(let [s# (new java.io.StringWriter)]
+     (with-bindings
+       {#'*assert-meta* ~(meta form),
+        #'*assert-out*  s#
+        #'*err*         s#
+        #'*out*         s#}
+       (try ~(t/assert-expr msg form)
+         (catch Throwable t#
+           (t/do-report
+            {:type     :error,
+             :message  ~msg,
+             :expected '~form,
+             :actual   t#,
+             :output   (str *assert-out*)})))))))
 
 (defmacro are
   "Forwards declaration to `clojure.test/are`"
@@ -84,7 +95,8 @@
 
                  :else
                  (assert-equals e# a# ~msg))]
-      (t/report (assoc r# :form '~form :form-meta *assert-meta*))
+      (t/report
+       (assoc r# :form '~form :form-meta *assert-meta* :output (str *assert-out*)))
       (:pass r#))
 
     `(throw (Exception. "=? expects 2 arguments."))))
