@@ -7,6 +7,7 @@
   (:import
     [java.util.regex Pattern]))
 
+(def ^:dynamic *assert-meta* nil)
 
 (defmacro deftest
   "Forwards declaration to `clojure.test/deftest`"
@@ -16,12 +17,12 @@
 (defmacro is
   ([form] `(is ~form nil))
   ([form msg]
-   #_(println ":meta" (meta form) ":form" &form)
-   `(try ~(t/assert-expr msg form)
-     (catch Throwable t#
-       (t/do-report
-        {:type     :error, :message ~msg,
-         :expected '~form, :actual t#})))))
+   `(binding [*assert-meta* ~(meta form)]
+     (try ~(t/assert-expr msg form)
+       (catch Throwable t#
+         (t/do-report
+          {:type     :error, :message ~msg,
+           :expected '~form, :actual t#}))))))
 
 (defmacro are
   "Forwards declaration to `clojure.test/are`"
@@ -34,16 +35,8 @@
   `(t/testing ~s ~@body))
 
 (defmacro =?
-  "Preatty prints evaluated expected and actual + diffs.
-
-  Example: (=? [2 3] [3])
-  Outputs:
-    expected: [2 3]
-      actual: [2]
-       diffs: [2 +3]"
-  ([a] `(is ~a))
-  ([e a] `(is (~'=? ~e ~a)))
-  ([e a msg] `(is (~'=? ~e ~a) ~msg)))
+  "Define a fake `=?` that always fail to compile but make intellij/Clojure-Kit happy."
+  ([a & extra] `(Please-use-=?-only-inside-of-is)))
 
 (defn assert-equals
   [e a msg]
@@ -75,6 +68,7 @@
       {:type     :fail, :message msg,
        :expected true, :actual r})))
 
+
 (defmethod t/assert-expr '=?
   ;; Defines a new special assert operator.
   [msg form]
@@ -85,14 +79,15 @@
                  (instance? java.util.regex.Pattern e#)
                  (assert-regex e# a# ~msg)
 
-                 (fn? e#)
+                 (t/function? e#)
                  (assert-predicate e# a# ~msg)
 
                  :else
                  (assert-equals e# a# ~msg))]
-      (t/report (assoc r# :form '~form :form-meta {:line nil}))
+      (t/report (assoc r# :form '~form :form-meta *assert-meta*))
       (:pass r#))
 
     `(throw (Exception. "=? expects 2 arguments."))))
+
 
 

@@ -87,9 +87,11 @@
   (second (re-find #"[\\/]?([^\\/]*$)" path)))
 
 (defn- get-running-test
-  []
-  (let [m (meta (first t/*testing-vars*))]
-    (str (:ns m) "/" (:name m) " (" (get-filename (:file m)) ":" (:line m) ")")))
+  [m]
+  (let [t-meta (meta (first t/*testing-vars*))
+        f-meta (:form-meta m)]
+    (str (:ns t-meta) "/" (:name t-meta) " (" (get-filename (:file t-meta))
+         ":" (or (:line f-meta) (:line t-meta)) ")")))
 
 
 (defmethod report :default
@@ -105,7 +107,7 @@
   [m]
   (t/with-test-out
    (t/inc-report-counter :fail)
-   (println (c/colorize [:red] "\nFAIL in") (get-running-test))
+   (println (c/colorize [:red] "\nFAIL in") (get-running-test m))
    (when (seq t/*testing-contexts*)
      (println (c/colorize [:white] (str "\t> \"" (t/testing-contexts-str) "\""))))
    (when (:form m)
@@ -125,7 +127,7 @@
   [m]
   (t/with-test-out
    (t/inc-report-counter :error)
-   (println (c/colorize [:bold :red] "\nERROR in") (get-running-test))
+   (println (c/colorize [:bold :red] "\nERROR in") (get-running-test m))
    (when (seq t/*testing-contexts*)
      (println (c/colorize [:white] (str "\t> \"" (t/testing-contexts-str) "\""))))
    (when (:message m) (println (c/colorize [:red] (str "     msg: " (:message m)))))
@@ -151,7 +153,7 @@
   [m]
   #_(t/with-test-out
      (println
-      (c/colorize [:italic :white] "Testing " (get-running-test))))
+      (c/colorize [:italic :white] "Testing " (get-running-test m))))
   (swap! *test-var-extra* assoc :start-at (System/nanoTime)))
 
 (defmethod report :end-test-var
@@ -159,4 +161,4 @@
   (let [dur (- (System/nanoTime) (:start-at @*test-var-extra*))]
     (t/with-test-out
      (println
-      (c/colorize [:italic :white] "Tested " (get-running-test) "  took " (nano->msecs dur) " msecs")))))
+      (c/colorize [:italic :white] "Tested " (get-running-test m) "  took " (nano->msecs dur) " msecs")))))
