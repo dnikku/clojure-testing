@@ -5,9 +5,11 @@
             [clojure.test :as t]
             [com.github.dnikku.clojure-testing.print
              :refer
-             [*print-ex-exclude-re* *print-ex-stack-limit* print-ex]]
+             [*print-ex-exclude-re* *print-ex-stack-limit* print-ex nano->msecs]]
             [com.github.dnikku.clojure-testing.colorize :as c])
   (:import [clojure.lang Compiler$CompilerException]))
+
+(def ^:dynamic *test-var-extra* nil)
 
 (defmulti report :type)
 
@@ -42,7 +44,8 @@
                         (with-bindings
                           {#'t/report               report
                            #'*print-ex-stack-limit* nil
-                           #'*print-ex-exclude-re*  exclude-re}
+                           #'*print-ex-exclude-re*  exclude-re
+                           #'*test-var-extra*       (atom {})}
                           (let [start-at (System/currentTimeMillis)]
                             (assoc (t/run-all-tests pattern)
                                    :duration-ms (- (System/currentTimeMillis) start-at))))))))
@@ -146,10 +149,14 @@
 
 (defmethod report :begin-test-var
   [m]
-  (t/with-test-out
-   (println
-    (c/colorize [:italic :white] "Testing " (get-running-test)))))
+  #_(t/with-test-out
+     (println
+      (c/colorize [:italic :white] "Testing " (get-running-test))))
+  (swap! *test-var-extra* assoc :start-at (System/nanoTime)))
 
-(defmethod report :end-test-var [m])
-
-
+(defmethod report :end-test-var
+  [m]
+  (let [dur (- (System/nanoTime) (:start-at @*test-var-extra*))]
+    (t/with-test-out
+     (println
+      (c/colorize [:italic :white] "Tested " (get-running-test) "  took " (nano->msecs dur) " msecs")))))
