@@ -5,7 +5,8 @@
     [clojure.string :as str]
     [clojure.stacktrace :as stacktrace])
   (:import
-    [clojure.lang ExceptionInfo]))
+    [clojure.lang ExceptionInfo]
+    [java.text DecimalFormat]))
 
 
 (def ^:dynamic *print-ex-stack-limit* nil)
@@ -78,6 +79,19 @@
   "Converts a value from nanoseconds to milliseconds."
   [x]
   (/ (double x) 1000000.0))
+
+(defn nano->str
+  "Converts a value from nanoseconds to micro/milli/seconds."
+  [x]
+  (let [micros (/ (double x) 1000)]
+    (if  (< micros 500)
+      (str (.format (DecimalFormat. "#,##0.00") micros) " \u00B5s")
+      (let [millis (/ micros 1000)]
+        (if (< millis 500)
+          (str (.format (DecimalFormat. "#,##0.00") millis) " ms")
+          (let [secs (/ millis 1000)]
+
+            (str (.format (DecimalFormat. "#,##0.00") secs) " s")))))))
 
 
 (def diffs-output?
