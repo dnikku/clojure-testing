@@ -1,16 +1,60 @@
+plugins {
+    id "java"
+    id "dev.clojurephant.clojure" version "0.6.0"
+    id 'com.adarshr.test-logger' version '3.2.0'
+}
+
+
+dependencies {
+    implementation 'org.junit.jupiter:junit-jupiter:5.7.1'
+    implementation 'org.clojure:clojure:1.11.1'
+    implementation 'org.clojure:tools.namespace:1.1.0'
+    implementation 'lambdaisland:deep-diff2:2.0.108'
+
+    devImplementation 'nrepl:nrepl:0.8.3'
+    devImplementation 'cider:cider-nrepl:0.27.2'
+
+    // testing
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        name = 'clojars'
+        url = 'https://repo.clojars.org'
+    }
+}
+
 
 defaultTasks 'assemble'
 
-allprojects {
 
-    repositories {
+tasks.withType(Test) {
+    useJUnitPlatform()
 
-        mavenCentral()
+    // for reporting, see: https://medium.com/@wasyl/pretty-tests-summary-in-gradle-744804dd676c
+}
 
-        maven {
-            name = 'clojars'
-            url = 'https://repo.clojars.org'
+
+/*
+clojure {
+    builds {
+        main {
+            aotAll()
+            reflection = 'warn'
         }
     }
+}*/
 
+
+clojureRepl {
+    port = 8095
+    handler = 'cider.nrepl/cider-nrepl-handler'
+}
+
+
+gradle.projectsEvaluated {
+    tasks.withType(JavaCompile) {
+        options.compilerArgs << "-Xlint:unchecked"
+    }
 }
