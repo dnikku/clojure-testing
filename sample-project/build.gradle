@@ -9,7 +9,7 @@ dependencies {
     implementation 'org.clojure:clojure:1.11.1'
 
     // testing
-    testImplementation gradle.includedBuild('./clojure-testing') // { transitive = true}
+    testImplementation 'clojure-testing' // { transitive = true}
     testImplementation 'lambdaisland:deep-diff2:2.0.108'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.7.1'
 
