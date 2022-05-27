@@ -1,5 +1,9 @@
+import org.gradle.api.publish.tasks.GenerateModuleMetadata
+
 plugins {
-    id "java"
+    id "java-library"
+    id 'maven-publish'
+
     id "dev.clojurephant.clojure" version "0.6.0"
     id 'com.adarshr.test-logger' version '3.2.0'
 }
@@ -57,4 +61,71 @@ gradle.projectsEvaluated {
     tasks.withType(JavaCompile) {
         options.compilerArgs << "-Xlint:unchecked"
     }
+}
+
+
+java {
+    withSourcesJar()
+}
+
+publishing {
+    repositories {
+        maven {
+            name = "clojars"
+            url = "https://repo.clojars.org"
+
+            credentials {
+            }
+        }
+    }
+
+
+    publications {
+        maven(MavenPublication) {
+            groupId = 'org.clojars.dnikku'
+            artifactId = 'clojure-testing'
+            version = '0.1'
+
+            from components.java
+
+            versionMapping {
+                usage('java-api') {
+                    fromResolutionOf('runtimeClasspath')
+                }
+                usage('java-runtime') {
+                    fromResolutionResult()
+                }
+            }
+
+            pom {
+                name = 'clojure-testing'
+                description = 'A library that allow you to run clojure.test from a gradle project via junit-jupiter besides java tests.'
+                url = 'https://github.com/dnikku/clojure-testing'
+                licenses {
+                    license {
+                        name = 'The MIT License'
+                        url = 'https://raw.githubusercontent.com/dnikku/clojure-testing/main/LICENSE'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'dnikku'
+                        name = 'Nicu Dascalu'
+                        email = 'dnikku@gmail.com'
+                    }
+                }
+                scm {
+                    connection = 'https://github.com/dnikku/clojure-testing.git'
+                    developerConnection = 'git@github.com:dnikku/clojure-testing.git'
+                    url = 'https://github.com/dnikku/clojure-testing'
+                }
+            }
+
+        }
+    }
+}
+
+// // Clojars doesn"t support module metadata
+tasks.withType(GenerateModuleMetadata) {
+    enabled = false
 }
