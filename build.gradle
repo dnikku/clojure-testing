@@ -131,3 +131,9 @@ publishing {
 tasks.withType(GenerateModuleMetadata) {
     enabled = false
 }
+
+task printSecrets(type: Task) {
+    group "run"
+    println " username = " + System.getenv("CLOJARS_USER")
+    println " password = " + System.getenv("CLOJARS_TOKEN")
+}

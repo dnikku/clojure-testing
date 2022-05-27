@@ -21,4 +21,4 @@ jobs:
         env:
           CLOJARS_USER: ${{ secrets.CLOJARS_USER }}
           CLOJARS_TOKEN: ${{ secrets.CLOJARS_TOKEN }}
-        run: ./gradlew publish
+        run: ./gradlew printSecrets
