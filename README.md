@@ -3,7 +3,7 @@
 A library that allows you to run `clojure.test` from a [gradle project](https://gradle.org/) via [junit-jupiter](https://search.maven.org/artifact/org.junit.jupiter/junit-jupiter-api/5.7.1/jar) besides java tests.
 
 ## Where ?
-[clojars](https://clojars.org/org.clojars.dnikku/clojure-testing)
+[![Clojars Project](https://img.shields.io/clojars/v/org.clojars.dnikku/clojure-testing.svg)](https://clojars.org/org.clojars.dnikku/clojure-testing)
 
 
 
